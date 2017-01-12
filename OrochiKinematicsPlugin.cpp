@@ -36,8 +36,8 @@ bool OrochiKinematicsPlugin::initialize() {
   OrochiKinematicsRTC_CnoidInit(&rtcManager);
   const char* param = "OrochiKinematicsRTC_Cnoid?instance_name=OrochiKinematicsRTC_Cnoid&exec_cxt.periodic.type=PeriodicExecutionContext&exec_cxt.periodic.rate=30";
   RTObject_impl* rtc = rtcManager.createComponent(param);
-  //pRTC = dynamic_cast<OrochiKinematicsRTC_Cnoid*>(rtc);
-  //pRTC->setPlugin(this);
+  pRTC = dynamic_cast<OrochiKinematicsRTC_Cnoid*>(rtc);
+  pRTC->setPlugin(this);
 
   return true;
 }
@@ -62,7 +62,7 @@ void OrochiKinematicsPlugin::onTest() {
   startJointAngles.push_back(0.6981);
   startJointAngles.push_back(0.6981);
   startJointAngles.push_back(-0.5236);
-  startJointAngles.push_back(0.0);
+  //startJointAngles.push_back(0.0);
   std::vector<double> targetJointAngles;
 
   
@@ -70,6 +70,11 @@ void OrochiKinematicsPlugin::onTest() {
   Return_t retval = this->inverseKinematics(eePose, startJointAngles, targetJointAngles);
   std::cout << "retval = " << retval.message << std::endl;
   
+}
+
+void OrochiKinematicsPlugin::onKinematicStateChanged(const std::string& name) {
+  std::cout << "onKinematcStateChanged: " << name << std::endl;
+  namedCounter[name] = namedCounter[name] + 1;
 }
 
 
@@ -81,8 +86,16 @@ Return_t OrochiKinematicsPlugin::inverseKinematics(const ::Pose3D& eePose, const
   std::cout << "                 " << eePose.orientation.r << ", " << eePose.orientation.y << ", " << eePose.orientation.p << "),\n";
   std::cout << "  startAngles::vector<double>(" << startJointAngles[0] << ", " << startJointAngles[1] << ", " << startJointAngles[2] << ", \n";
   std::cout << "                              " << startJointAngles[3] << ", " << startJointAngles[4] << ", " << startJointAngles[5] << "))\n";
+
+  
   std::string name = "orochi";
   cnoid::BodyItemPtr targetBodyItem;
+
+  if (startJointAngles.size() != 6) {
+    retval.returnValue = RETVAL_INVALID_JOINT_NUM;
+    retval.message = "ERROR.OrochiKinematics needs 6 jointSeq values.";
+    return retval;
+  }
   
   cnoid::ItemList<cnoid::BodyItem> bodyItems = cnoid::ItemTreeView::instance()->checkedItems<cnoid::BodyItem>();
   for(size_t i = 0;i < bodyItems.size(); ++i) {
@@ -91,14 +104,47 @@ Return_t OrochiKinematicsPlugin::inverseKinematics(const ::Pose3D& eePose, const
       targetBodyItem = bodyItems[i];
     }
   }
-
+  
   if (!targetBodyItem) {
     retval.returnValue = RETVAL_MODEL_NOT_FOUND;
     retval.message = "Model is not found.";
     return retval;
   }
-
   cnoid::BodyPtr body = targetBodyItem->body();
+
+  /**
+  cnoid::WorldItemPtr world = targetBodyItem->findOwnerItem<cnoid::WorldItem>();
+  if (!world) {
+    retval.returnValue = RETVAL_INVALID_PRECONDITION;
+    retval.message = "Choreonoid needs WorldItem to Kinematics Calculation";
+    return retval;
+  }
+  */
+  
+  std::map<std::string, int32_t>::iterator itr = namedCounter.find(name);
+  if (itr == namedCounter.end()) {
+    namedCounter[name] = 0;
+    //world->sigCollisionsUpdated()
+    targetBodyItem->sigKinematicStateChanged()    
+      .connect(boost::bind(&OrochiKinematicsPlugin::onKinematicStateChanged, this, name));
+  }
+
+
+  for(int j=0; j < startJointAngles.size(); ++j){
+    body->joint(j)->q() = startJointAngles[j];
+  }
+  targetBodyItem->notifyKinematicStateChange(true); 
+
+
+  while(true) {
+    if (namedCounter[name] > 0) {
+      break;
+    }
+    ; // do nothing
+  }
+
+
+  
   cnoid::LinkPtr base = body->rootLink();
   cnoid::LinkPtr wrist = body->link("j6");
   cnoid::JointPathPtr baseToWrist = cnoid::getCustomJointPath(body, base, wrist);

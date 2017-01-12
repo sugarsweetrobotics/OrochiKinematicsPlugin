@@ -79,7 +79,7 @@ RTC::ReturnCode_t OrochiKinematicsRTC_Cnoid::onInitialize()
   // Set CORBA Service Ports
    addPort(m_kinematicsPort);
   ///m_kinematicsService.setRTC(this);
-  
+   m_kinematicsService.setRTC(this);  
   // </rtc-template>
 
   // <rtc-template block="bind_config">

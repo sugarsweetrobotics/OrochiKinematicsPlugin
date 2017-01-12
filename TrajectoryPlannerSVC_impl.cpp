@@ -96,7 +96,8 @@ Manipulation_KinematicSolverServiceSVC_impl::~Manipulation_KinematicSolverServic
  */
 Manipulation::ReturnValue* Manipulation_KinematicSolverServiceSVC_impl::solveKinematics(const Manipulation::EndEffectorPose& targetPose, const Manipulation::JointAngleSeq& startJointAngles,  Manipulation::JointAngleSeq_out targetJointAngles)
 {
-  Manipulation::ReturnValue* result;
+  Manipulation::ReturnValue_var result(new Manipulation::ReturnValue());
+  std::cout << "OrochiKinematicsRTC::solveKienmatics called." << std::endl;
   // Please insert your code here and remove the following warning pragma
   ::Pose3D eePose;
   eePose.position.x = targetPose.pose.position.x;
@@ -114,13 +115,29 @@ Manipulation::ReturnValue* Manipulation_KinematicSolverServiceSVC_impl::solveKin
   Return_t retval = m_pRTC->getPlugin()->inverseKinematics(eePose, startJoints, resultJoints);
 
   Manipulation::JointAngleSeq_var targetJointAngles_out(new Manipulation::JointAngleSeq());
-  targetJointAngles_out->length(resultJoints.size());
-  for(int i = 0;i < resultJoints.size();i++) {
-    targetJointAngles_out[i].data = resultJoints[i];
+  switch(retval.returnValue) {
+  case RETVAL_OK:
+    result->id = Manipulation::OK;
+    targetJointAngles_out->length(resultJoints.size());
+    for(int i = 0;i < resultJoints.size();i++) {
+      targetJointAngles_out[i].data = resultJoints[i];
+    }
+    break;
+  case RETVAL_MODEL_NOT_FOUND:
+    result->id = Manipulation::MODEL_NOT_FOUND;
+    break;
+  case RETVAL_INVALID_ARGUMENT:
+    result->id = Manipulation::INVALID_ARGUMENT;
+    break;
+  case RETVAL_INVALID_PRECONDITION:
+    result->id = Manipulation::INVALID_SETTING;
+    break;
+  default:
+    result->id = Manipulation::ERROR_UNKNOWN;
   }
-
+  result->message = CORBA::string_dup(retval.message.c_str());
   targetJointAngles = targetJointAngles_out._retn();
-  return result;
+  return result._retn();
 }
 
 

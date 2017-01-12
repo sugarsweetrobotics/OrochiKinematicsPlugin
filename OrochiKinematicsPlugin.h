@@ -66,6 +66,9 @@ public:
 
   void onTest();
 
+  std::map<std::string, int32_t> namedCounter;
+  void onKinematicStateChanged(const std::string& name);
+  
   Return_t inverseKinematics(const Pose3D& eePose, const std::vector<double> startJointAngles, std::vector<double>& resultJointAngles);
 };
 
