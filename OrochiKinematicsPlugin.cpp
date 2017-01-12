@@ -8,6 +8,8 @@
 #include <cnoid/ToolBar>
 #include <cnoid/OpenRTMUtil>
 
+#include <cnoid/JointPath>
+#include <cnoid/EigenUtil>
 #include <boost/bind.hpp>
 
 #include "OrochiKinematicsPlugin.h"
@@ -42,12 +44,43 @@ bool OrochiKinematicsPlugin::initialize() {
 
 
 void OrochiKinematicsPlugin::onTest() {
+  ::Pose3D eePose;
+  eePose.position.x = 0.0880713;
+  eePose.position.y = -0.00525294;
+  eePose.position.z = 0.740525;
+  eePose.orientation.r = 0.140208;
+  eePose.orientation.p = 0.44425;
+  eePose.orientation.y = 0.205369;
+
+  eePose.position.z -= 0.05;
+  
+  
+  std::vector<double> startJointAngles;
+  startJointAngles.push_back(-0.2618);
+  startJointAngles.push_back(-0.2094);
+  startJointAngles.push_back(1.0472);
+  startJointAngles.push_back(0.6981);
+  startJointAngles.push_back(0.6981);
+  startJointAngles.push_back(-0.5236);
+  startJointAngles.push_back(0.0);
+  std::vector<double> targetJointAngles;
+
+  
+
+  Return_t retval = this->inverseKinematics(eePose, startJointAngles, targetJointAngles);
+  std::cout << "retval = " << retval.message << std::endl;
+  
 }
 
 
 Return_t OrochiKinematicsPlugin::inverseKinematics(const ::Pose3D& eePose, const std::vector<double> startJointAngles, std::vector<double>& resultJointAngles) {
   Return_t retval;
 
+  std::cout << "OrochiKinematicsPlugin::inverseKinematics(\n";
+  std::cout << "  eePose::Pose3D(" << eePose.position.x << ", " << eePose.position.y << ", " << eePose.position.z << ", \n";
+  std::cout << "                 " << eePose.orientation.r << ", " << eePose.orientation.y << ", " << eePose.orientation.p << "),\n";
+  std::cout << "  startAngles::vector<double>(" << startJointAngles[0] << ", " << startJointAngles[1] << ", " << startJointAngles[2] << ", \n";
+  std::cout << "                              " << startJointAngles[3] << ", " << startJointAngles[4] << ", " << startJointAngles[5] << "))\n";
   std::string name = "orochi";
   cnoid::BodyItemPtr targetBodyItem;
   
@@ -66,8 +99,38 @@ Return_t OrochiKinematicsPlugin::inverseKinematics(const ::Pose3D& eePose, const
   }
 
   cnoid::BodyPtr body = targetBodyItem->body();
-  // Link* wrist = body->link("j6");
+  cnoid::LinkPtr base = body->rootLink();
+  cnoid::LinkPtr wrist = body->link("j6");
+  cnoid::JointPathPtr baseToWrist = cnoid::getCustomJointPath(body, base, wrist);
+  cnoid::Vector3 currentXYZ = wrist->p();
+  cnoid::Vector3 currentRPY = cnoid::rpyFromRot(wrist->attitude());
+  std::cout << " - CurrentPose3D:" << std::endl;
+  std::cout << " " << currentXYZ[0] << ", " << currentXYZ[1] << ", " << currentXYZ[2] << "\n";
+  std::cout << " " << currentRPY[0] << ", " << currentRPY[1] << ", " << currentRPY[2] << "\n";  
   
+  
+  cnoid::Vector3 rpy;
+  rpy[0] = eePose.orientation.r;
+  rpy[1] = eePose.orientation.p;
+  rpy[2] = eePose.orientation.y;
+  cnoid::Vector3 xyz;
+  xyz[0] = eePose.position.x;
+  xyz[1] = eePose.position.y;
+  xyz[2] = eePose.position.z;
+
+  if(!baseToWrist->calcInverseKinematics(xyz, (cnoid::rotFromRpy(rpy)))) {
+      retval.returnValue = RETVAL_INVALID_ARGUMENT;
+      retval.message = "Cannot Solve Inverse Kinematics";
+      return retval;
+  } else {
+    for(int i = 0;i < startJointAngles.size();i++) {
+      resultJointAngles.push_back(baseToWrist->joint(i)->q());
+    }
+  }
+
+  
+  retval.returnValue = RETVAL_OK;
+  retval.message = "OK";
   return retval;
 }
 
