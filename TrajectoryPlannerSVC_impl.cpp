@@ -14,7 +14,7 @@
 
 /*
  * Example implementational code for IDL interface Manipulation::ObjectDetectionService
- */
+
 Manipulation_ObjectDetectionServiceSVC_impl::Manipulation_ObjectDetectionServiceSVC_impl()
 {
   // Please add extra constructor code here.
@@ -25,11 +25,11 @@ Manipulation_ObjectDetectionServiceSVC_impl::~Manipulation_ObjectDetectionServic
 {
   // Please add extra destructor code here.
 }
-
+*/
 
 /*
  * Methods corresponding to IDL attributes and operations
- */
+
 Manipulation::ReturnValue* Manipulation_ObjectDetectionServiceSVC_impl::detectObject(const Manipulation::ObjectIdentifier& objectID, Manipulation::ObjectInfo_out objInfo)
 {
 	Manipulation::ReturnValue* result;
@@ -42,14 +42,14 @@ Manipulation::ReturnValue* Manipulation_ObjectDetectionServiceSVC_impl::setBaseF
   // Please insert your code here and remove the following warning pragma
   return result;
 }
-
+*/
 
 
 // End of example implementational code
 
 /*
  * Example implementational code for IDL interface Manipulation::ObjectHandleStrategyService
- */
+
 Manipulation_ObjectHandleStrategyServiceSVC_impl::Manipulation_ObjectHandleStrategyServiceSVC_impl()
 {
   // Please add extra constructor code here.
@@ -60,18 +60,18 @@ Manipulation_ObjectHandleStrategyServiceSVC_impl::~Manipulation_ObjectHandleStra
 {
   // Please add extra destructor code here.
 }
-
+*/
 
 /*
  * Methods corresponding to IDL attributes and operations
- */
+
 Manipulation::ReturnValue* Manipulation_ObjectHandleStrategyServiceSVC_impl::getApproachOrientation(const Manipulation::ObjectInfo& objInfo, Manipulation::EndEffectorPose& eePos)
 {
 	Manipulation::ReturnValue* result;
   // Please insert your code here and remove the following warning pragma
   return result;
 }
-
+*/
 
 
 // End of example implementational code
@@ -146,7 +146,7 @@ Manipulation::ReturnValue* Manipulation_KinematicSolverServiceSVC_impl::solveKin
 
 /*
  * Example implementational code for IDL interface Manipulation::CollisionDetectionService
- */
+
 Manipulation_CollisionDetectionServiceSVC_impl::Manipulation_CollisionDetectionServiceSVC_impl()
 {
   // Please add extra constructor code here.
@@ -157,24 +157,24 @@ Manipulation_CollisionDetectionServiceSVC_impl::~Manipulation_CollisionDetection
 {
   // Please add extra destructor code here.
 }
-
+*/
 
 /*
  * Methods corresponding to IDL attributes and operations
- */
+
 Manipulation::ReturnValue* Manipulation_CollisionDetectionServiceSVC_impl::isCollide(const Manipulation::RobotIdentifier& robotID, const Manipulation::JointAngleSeq& jointAngles, Manipulation::CollisionPairSeq_out collisions)
 {
   Manipulation::ReturnValue_var result(new Manipulation::ReturnValue());
   return result._retn();
 }
 
-
+*/
 
 // End of example implementational code
 
 /*
  * Example implementational code for IDL interface Manipulation::ManipulationPlannerService
- */
+
 Manipulation_ManipulationPlannerServiceSVC_impl::Manipulation_ManipulationPlannerServiceSVC_impl()
 {
   // Please add extra constructor code here.
@@ -185,11 +185,11 @@ Manipulation_ManipulationPlannerServiceSVC_impl::~Manipulation_ManipulationPlann
 {
   // Please add extra destructor code here.
 }
-
+*/
 
 /*
  * Methods corresponding to IDL attributes and operations
- */
+
 Manipulation::ReturnValue* Manipulation_ManipulationPlannerServiceSVC_impl::planManipulation(const Manipulation::RobotJointInfo& jointsInfo, const Manipulation::JointAngleSeq& startJointAngles, const Manipulation::JointAngleSeq& goalJointAngles, Manipulation::ManipulationPlan_out manipPlan)
 {
 	Manipulation::ReturnValue* result;
@@ -200,13 +200,13 @@ Manipulation::ReturnValue* Manipulation_ManipulationPlannerServiceSVC_impl::plan
   return result;
 }
 
-
+*/
 
 // End of example implementational code
 
 /*
  * Example implementational code for IDL interface Manipulation::ModelServerService
- */
+
 Manipulation_ModelServerServiceSVC_impl::Manipulation_ModelServerServiceSVC_impl()
 {
   // Please add extra constructor code here.
@@ -217,12 +217,12 @@ Manipulation_ModelServerServiceSVC_impl::~Manipulation_ModelServerServiceSVC_imp
 {
   // Please add extra destructor code here.
 }
-
+*/
 
 
 /*
  * Methods corresponding to IDL attributes and operations
- */
+
 Manipulation::ReturnValue* Manipulation_ModelServerServiceSVC_impl::getModelInfo(const Manipulation::RobotIdentifier& robotID, Manipulation::RobotJointInfo_out jointsInfo)
 {
   Manipulation::ReturnValue_var result(new Manipulation::ReturnValue());
@@ -238,14 +238,14 @@ Manipulation::ReturnValue* Manipulation_ModelServerServiceSVC_impl::getMeshInfo(
 #endif
   return result;
 }
-
+*/
 
 
 // End of example implementational code
 
 /*
  * Example implementational code for IDL interface Manipulation::MotionGeneratorService
- */
+
 Manipulation_MotionGeneratorServiceSVC_impl::Manipulation_MotionGeneratorServiceSVC_impl()
 {
   // Please add extra constructor code here.
@@ -256,11 +256,11 @@ Manipulation_MotionGeneratorServiceSVC_impl::~Manipulation_MotionGeneratorServic
 {
   // Please add extra destructor code here.
 }
-
+*/
 
 /*
  * Methods corresponding to IDL attributes and operations
- */
+
 Manipulation::ReturnValue* Manipulation_MotionGeneratorServiceSVC_impl::followManipPlan(const Manipulation::ManipulationPlan& manipPlan)
 {
 	Manipulation::ReturnValue* result;
@@ -280,7 +280,7 @@ Manipulation::ReturnValue* Manipulation_MotionGeneratorServiceSVC_impl::getCurre
 #endif
   return result;
 }
-
+*/
 
 
 // End of example implementational code
