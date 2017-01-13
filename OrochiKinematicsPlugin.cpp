@@ -181,9 +181,10 @@ Return_t OrochiKinematicsPlugin::inverseKinematics(const ::Pose3D& eePose, const
   } else {
     for(int i = 0;i < startJointAngles.size();i++) {
       resultJointAngles.push_back(baseToWrist->joint(i)->q());
+      body->joint(i)->q() = baseToWrist->joint(i)->q();
     }
   }
-
+  targetBodyItem->notifyKinematicStateChange(true); 
   
   retval.returnValue = RETVAL_OK;
   retval.message = "OK";
