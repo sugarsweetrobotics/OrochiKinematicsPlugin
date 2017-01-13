@@ -112,7 +112,7 @@ Manipulation::ReturnValue* Manipulation_KinematicSolverServiceSVC_impl::solveKin
     startJoints.push_back((double)startJointAngles[i].data);
   };
   std::vector<double> resultJoints;
-  Return_t retval = m_pRTC->getPlugin()->inverseKinematics(eePose, startJoints, resultJoints);
+  Return_t retval = m_pRTC->getPlugin()->inverseKinematicsSynchronously(eePose, startJoints, resultJoints);
 
   Manipulation::JointAngleSeq_var targetJointAngles_out(new Manipulation::JointAngleSeq());
   switch(retval.returnValue) {

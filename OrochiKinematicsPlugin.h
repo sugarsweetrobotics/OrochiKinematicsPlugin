@@ -68,8 +68,18 @@ public:
 
   std::map<std::string, int32_t> namedCounter;
   void onKinematicStateChanged(const std::string& name);
+
+  Pose3D __eePose;
+  std::vector<double> __startJointAngles;
+  std::vector<double> __resultJointAngles;
+  Return_t __retval;
+  void __inverseKinematics() {
+    __retval = this->inverseKinematics(__eePose, __startJointAngles, __resultJointAngles);
+  }
   
   Return_t inverseKinematics(const Pose3D& eePose, const std::vector<double> startJointAngles, std::vector<double>& resultJointAngles);
+  
+  Return_t inverseKinematicsSynchronously(const Pose3D& eePose, const std::vector<double> startJointAngles, std::vector<double>& resultJointAngles);
 };
 
 

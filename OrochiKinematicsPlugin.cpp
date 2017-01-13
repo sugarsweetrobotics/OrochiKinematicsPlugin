@@ -2,12 +2,13 @@
  *   @author Yuki Suga at SSR
  */
 
+#include <cnoid/MessageView>
 #include <cnoid/ItemTreeView>
 #include <cnoid/BodyItem>
 #include <cnoid/WorldItem>
 #include <cnoid/ToolBar>
 #include <cnoid/OpenRTMUtil>
-
+#include <cnoid/LazyCaller>
 #include <cnoid/JointPath>
 #include <cnoid/EigenUtil>
 #include <boost/bind.hpp>
@@ -77,6 +78,14 @@ void OrochiKinematicsPlugin::onKinematicStateChanged(const std::string& name) {
   namedCounter[name] = namedCounter[name] + 1;
 }
 
+Return_t OrochiKinematicsPlugin::inverseKinematicsSynchronously(const ::Pose3D& eePose, const std::vector<double> startJointAngles, std::vector<double>& resultJointAngles) {
+  __eePose = eePose;
+  __startJointAngles = startJointAngles;
+  __resultJointAngles.clear();
+  cnoid::callSynchronously(boost::bind(&OrochiKinematicsPlugin::__inverseKinematics, this));
+  resultJointAngles.insert(resultJointAngles.end(), __resultJointAngles.begin(), __resultJointAngles.end());
+  return __retval;
+}
 
 Return_t OrochiKinematicsPlugin::inverseKinematics(const ::Pose3D& eePose, const std::vector<double> startJointAngles, std::vector<double>& resultJointAngles) {
   Return_t retval;
@@ -135,14 +144,15 @@ Return_t OrochiKinematicsPlugin::inverseKinematics(const ::Pose3D& eePose, const
   }
   targetBodyItem->notifyKinematicStateChange(true); 
 
-
+  /*
   while(true) {
     if (namedCounter[name] > 0) {
       break;
     }
     ; // do nothing
   }
-
+  */
+  cnoid::MessageView::instance()->flush();
 
   
   cnoid::LinkPtr base = body->rootLink();
